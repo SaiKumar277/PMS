@@ -1,0 +1,21 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-pms-dev-04444-authRole",
+      "UnauthRoleArn": "arn:aws:iam::488135134345:role/amplify-pms-dev-04444-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::488135134345:role/amplify-pms-dev-04444-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-pms-dev-04444-deployment",
+      "UnauthRoleName": "amplify-pms-dev-04444-unauthRole",
+      "StackName": "amplify-pms-dev-04444",
+      "StackId": "arn:aws:cloudformation:us-east-1:488135134345:stack/amplify-pms-dev-04444/7cbeef10-bdb9-11ec-9c38-0efbf6f92cb5",
+      "AmplifyAppId": "d1xp38hy01e60t"
+    },
+    "categories": {
+      "auth": {
+        "PMSAuth123": {},
+        "true": {}
+      }
+    }
+  }
+}

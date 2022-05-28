@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "apiName": "pms",
+    "serviceName": "AppSync",
+    "gqlSchemaPath": "C:\\Users\\DELL\\OneDrive\\Desktop\\PMS\\amplify\\backend\\api\\pms\\schema.graphql",
+    "defaultAuthType": {
+      "mode": "API_KEY",
+      "expirationTime": 365,
+      "apiKeyExpirationDate": "2023-05-26T20:01:45.591Z",
+      "keyDescription": ""
+    },
+    "conflictResolution": {},
+    "additionalAuthTypes": []
+  }
+}
