@@ -9,21 +9,60 @@ type Serviceman @model  {
   sex: String!
   category: [String!]!
   address: String
-  postcode:Int
+  postcode:String
   county:String
+  calloutcharge:Int!
   phonenumber: AWSPhone
   image:String
+  rating:Int!
 
 }
 
-type Jinfo @model {
+
+type MCSignupinfo @model {
   id: ID!
-  created_by: String!
-  block_name: String!
-  category: String!
-  schedule: String!
+  contract_type: String!
+  notes:String
+}
+type MCPropertyinfo @model {
+  id:ID!
+  name:String!
+  city:String!
+  region:String
+  postcode:String!
+  county:String!
+  country:String!
+  created_by:String
+}
+type Services  @model {
+  id:ID!
+  category:String!
+  schedule:String!
   day:String
-  time:String
+  blockid:String!
+  istarttime:AWSTime
+  iendtime:AWSTime
+  startdate:String
+  serviceman:String
+  servicemanid:String
+  sm_assigned:Boolean
+  block_name:String
+  created_by:String
+  notes:String
+  smtime:String
+}
+type ServiceDetails  @model {
+  id:ID!
+  startimgs:[String]
+  starttime:String!
+  endimgs:[String]
+  endtime:String!
+  servicesid:String!
+  blockid:String!
+  serviceman:String
+  category:String
+  servicemanid:String!
+  block:String!
 }
 
 

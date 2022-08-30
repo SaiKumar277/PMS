@@ -15,6 +15,7 @@ const { width, height } = Dimensions.get('window');
 
 
 
+
 export default function Page1({ navigation ,updateAuthState}) {
     
   const [name, setname] = useState('');
@@ -26,6 +27,25 @@ export default function Page1({ navigation ,updateAuthState}) {
   const [Profile, setProfile] = useState('');
 
   const { SignUp } = useContext(AuthContext);
+  const handleSubmit = async () => {
+    try {
+      if(Profile.trim() == "" || name.trim() == ""|| password.trim() == ""|| email.trim() == "")
+              {
+                  console.log("AlertBox: ");
+                  Alert.alert(
+                      "Enter all fields",
+                      "You left some required fields",
+                    );
+              }
+      else{
+        SignUp(name, email, password, Profile,{navigation});
+        } 
+      }
+      catch(e){
+        console.log(e);
+      }
+
+};
   return (
       <SafeAreaView style={styles.safeAreaContainer}>
       <View style={styles.container}>
@@ -88,7 +108,7 @@ export default function Page1({ navigation ,updateAuthState}) {
                     Already have an account? Sign In
                     </Text>
                 </TouchableOpacity>
-                <AppButton title="Sign Up" onPress={() => SignUp(name, email, password, Profile,{navigation})} />
+                <AppButton title="Sign Up" onPress={handleSubmit}  />
                 <View style={styles.footerButtonContainer}>
                
                 </View>

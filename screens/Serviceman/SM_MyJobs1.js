@@ -38,7 +38,7 @@ export default function SM_Myjobs1 ({navigation}){
               <Text style={styles.text}>No Job yet</Text>
               <Image  style = {styles.img} 
                      source = {img1} />           
-            <Navbar/>
+            <Navbar navigation={navigation}/>
         </SafeAreaView>
     );
 }

@@ -10,7 +10,7 @@ export default function Menubar({navigation}) {
             <Icon name="menu-2-fill" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.notif}
-            onPress = {() => {alert("you clicked")}}>
+            onPress = {() => {alert("No notifications")}}>
             <Icon name="notification-2-line" />
         </TouchableOpacity>
     </View>

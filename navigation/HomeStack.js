@@ -6,21 +6,31 @@ import SM_NavStack from '../screens/Serviceman/SM_NavStack';
 import { NavigationContainer } from '@react-navigation/native';
 import Amplify, { Auth } from 'aws-amplify';
 import awsconfig from '../src/aws-exports';
+import Loading from '../components/Loading';
+import { set } from 'react-native-reanimated';
 
 Amplify.configure(awsconfig);
   export default function HomeStack({updateAuthState}) {
     const [Profile, setProfile] = useState('');
+    const [load, setLoad] = useState(true);
       useEffect(() => {
+       // console.log('111');
         getName();
-    }, [])
+    }, [load])
       async function getName(){
         try {
-          const currentUserInfo = await Auth.currentUserInfo()
-          setProfile( currentUserInfo.attributes['custom:Profile']);
+          //currentUserInfo.attributes['custom:Profile']
+          const currentUserInfo = await Auth.currentAuthenticatedUser();
+           setProfile( currentUserInfo.attributes["custom:Profile"]);
+          //console.log('currentUserInfo ',currentUserInfo.attributes["custom:Profile"]);
+          //console.log('Profile ',Profile);
+          setLoad(false);
         } catch (err) {
           console.log('error fetching user info: ', err);
         }
       }
+      if(load)return <Loading/>
+      else{
     return (
       <NavigationContainer independent={true}>
         {Profile === 'Management Comapany' && (
@@ -31,4 +41,5 @@ Amplify.configure(awsconfig);
         )}
       </NavigationContainer>
     );
+        }
   }

@@ -1,5 +1,5 @@
 import React, { useState, useContext,useEffect,Component} from 'react';
-import {AppTextInput , Picker ,Dimensions, StatusBar,SafeAreaView ,StyleSheet, Text,TouchableOpacity,View ,Image,TextInput,AppButton} from 'react-native';
+import {AppTextInput , Picker ,Dimensions, StatusBar,SafeAreaView ,StyleSheet, Text,TouchableOpacity,View ,Image,TextInput,AppButton, ScrollView} from 'react-native';
 import Button from '../../components/AppButton';
 import img1 from '../../assets/images/homeback.png';
 import jobicon from '../../assets/images/jobsimg.png';
@@ -9,30 +9,77 @@ import sort from '../../assets/images/sort.png';
 import ModalDropdown from 'react-native-modal-dropdown';
 import Navbar from '../../components/Navbar';
 import Menubar from '../../components/Menubar';
-
-
+import Icon from 'react-native-remix-icon';
+import * as queries from '../../src/graphql/queries';
+import { useIsFocused } from "@react-navigation/native";
+import Loading from '../../components/Loading';
+import img11 from '../../assets/images/home.png';
+import moment from 'moment';
 var { height } = Dimensions.get('window');
   var box_count = 12;
   var box_height = height / box_count;
 
 export default function SM_ServiceHistory ({navigation}){
-    const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [Profile, setProfile] = useState('');
+    const [pos, setPos] = useState(false);
+  const [his, setHis] = useState('');
+  const [datechecker, setDatechecker] = useState(false);
+  const [data, setData] = useState('');
+  const isFocused = useIsFocused();
+  const [time, setTime] = useState(new Date(Date.now()));
+
+    useEffect(() => {  
+        fetchData();
+      }, [pos]);
+
+
+    const fetchData =async() =>{
+        try{
+            const user = await Auth.currentAuthenticatedUser();
+            let filter = {
+                servicemanid: {
+                    eq:user.attributes['email']
+                }
+            };
+            const oneTodo = await API.graphql({ query: queries.listServiceDetails, variables: { filter: filter}});
+            setData(oneTodo.data.listServiceDetails.items);
+            //console.log('onetodo',oneTodo);
+            //setTime(data);
+           // console.log('data',data[0].createdAt.slice(11,16));
+            setPos(true);
+        }
+        catch(err){
+            console.log('error fetching data ',err);
+        }
+    };
   
-   const state = {user:''}
-   const updateUser = (user) => {
-       this.setState({user : user})
+   if(!pos)return <Loading/>;
+   else if(data.length==0){
+    return(
+        <SafeAreaView style={styles.safeAreaContainer}>
+        <View style={styles.container}>
+           <StatusBar animated = {true}
+                      backgroundColor="#000000"/>
+            <Menubar navigation={navigation} />
+                
+            </View>
+                   
+              <Text style={styles.text}>No services done</Text>
+              <Image  style = {styles.img11} 
+                     source = {img11} />           
+        </SafeAreaView>
+    );
    }
+   else{
   
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
+        
         <View style={styles.container}>
             <StatusBar animated = {true}
                             backgroundColor="#000000"/>   
                     <Menubar navigation={navigation} />  
             </View> 
-
+            <ScrollView>
             <View style={styles.Second}>
                 <Text style={styles.serTxt}>Service History</Text>
             </View>
@@ -40,63 +87,48 @@ export default function SM_ServiceHistory ({navigation}){
                     <Text style={styles.filtxt}>Sort</Text>
                     <TouchableOpacity style = {styles.sortButton} 
                     onPress = {() => {alert("you clicked")}}>
-                     <Image 
-                        source = {sort} />
+                        <Icon name="arrow-up-down-line" />
                     </TouchableOpacity>
                 </View>
+            {data.map((item, index) => (
+                <View key={index}  >
+                    
+                    <View>
+                    <View style={styles.Third}>
+                        <Entypo name="controller-record" size={14} style={styles.cirIcon}/>
+                            <Text style={styles.dateTxt}>{item.createdAt.slice(0,10)}</Text>
+                    </View>
+                    <View style={styles.Fourth}>
+                    </View>
+                    </View>
 
-                <View style={styles.Third}>
-                    <Entypo name="controller-record" size={14} style={styles.cirIcon}/>
-                    <Text style={styles.dateTxt}>01-02-2022</Text>
-                </View>
-
-                <View style={styles.Fourth}>
-                 </View>
-                 <View style={styles.Fifth}>
+                 <TouchableOpacity style={styles.Fifth} onPress={() => navigation.navigate('SM_ServiceDetails',{p1:item.id})}>
                      <View style = {styles.five1}>
                      <View style={styles.fivep1}>
                          <AntDesign name="minus" style={styles.minusIcon} size={20} />
-                         <Text style={styles.sideTxt}>Block C, Kingston</Text>
+                         <Text style={styles.sideTxt}>{item.block}</Text>
                          </View>
                          <View style={styles.fivep1}>
                          <AntDesign name="minus" style={styles.minusIcon} size={20} />
-                         <Text style={styles.sideTxt}>Cleaning</Text>
+                         <Text style={styles.sideTxt}>{item.category}</Text>
                          </View>
                          <View style={styles.fivep1}>
                          <AntDesign name="minus" style={styles.minusIcon} size={20} />
-                         <Text style={styles.sideTxt}>17:00 to 19:30</Text>
+                         <Text style={styles.sideTxt}>{item.starttime.slice(16,21)} to {item.endtime.slice(16,21)}</Text>
                          </View>
                      </View>
                      <View style={styles.five2}>
                      <Image  style = {styles.img} 
                      source = {img1} />
                      </View>
+                 </TouchableOpacity>
                  </View>
-                 
-                 <View style={styles.Sixth}>
-                     <View style = {styles.five1}>
-                         <View style={styles.fivep1}>
-                         <AntDesign name="minus" style={styles.minusIcon} size={20} />
-                         <Text style={styles.sideTxt}>Block B, Kingston</Text>
-                         </View>
-                         <View style={styles.fivep1}>
-                         <AntDesign name="minus" style={styles.minusIcon} size={20} />
-                         <Text style={styles.sideTxt}>Gardening</Text>
-                         </View>
-                         <View style={styles.fivep1}>
-                         <AntDesign name="minus" style={styles.minusIcon} size={20} />
-                         <Text style={styles.sideTxt}>9:30 to 10:30</Text>
-                         </View>
-                     </View>
-                     <View style={styles.five2}>
-                     <Image  style = {styles.img} 
-                        source = {img1} />
-                     </View>
-                 </View>
-                <Navbar/>
-          
+               ))}
+               <View style={{height:1.5*box_height}}/>
+                 </ScrollView>
+                 <Navbar navigation={navigation}/>
         </SafeAreaView>
-    );
+    );}
 }
 
 const styles = StyleSheet.create({
@@ -104,26 +136,26 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white'
     },
+    text:{
+        marginVertical:40,
+         color:"#00286B",
+         fontSize:30,
+         alignSelf:'center',
+         fontWeight:'bold'
+        
+    },
+    img11 :{
+        alignSelf:'center',
+        marginTop:20,
+        height:height*0.20,
+        width:'50%'
+    },
     First :{
       height : 0.5*box_height
     },
-    hamButton:{
-        padding : 10   
-    },
-    msgButton : {  
-        padding:5,
-        position:'absolute',
-        right:3,
-        alignSelf:'flex-start'  
-    },
-    two:{
-        marginTop:10,
-        height : '4%',
-        width:'100%',
-        backgroundColor:"#00286B"
-    },
     Second:{
-      height:0.8*box_height,
+        paddingVertical:0.3*box_height,
+     // height:1*box_height,
     },
     serTxt:{
         fontWeight:'bold',
@@ -141,7 +173,8 @@ const styles = StyleSheet.create({
         height:0.65*box_height,
         borderWidth : 2,
         width:"28%",
-        borderColor : '#005DAF'
+        borderColor : '#005DAF',
+        marginBottom  :0.3*box_height,
     },
     filtxt:{  
         padding:3,
@@ -161,7 +194,8 @@ const styles = StyleSheet.create({
     Third:{
         marginLeft:20,
      height:0.5*box_height,
-     flexDirection:'row'
+     flexDirection:'row',
+     
     },
     cirIcon:{
        color:'#00286B',
@@ -176,7 +210,7 @@ const styles = StyleSheet.create({
          width:'80%',
          alignSelf:'center',
          marginTop:5,
-         marginBottom:10,
+         marginBottom  :0.3*box_height,
          backgroundColor:"#00286B"
      },
      Fifth:{
@@ -195,16 +229,21 @@ const styles = StyleSheet.create({
      five1:{
          marginTop:0.3*box_height,
         backgroundColor:'#1364A9',
-         width:'60%',
-         height:2.5*box_height,
+         width:'90%',
+         height:2.2*box_height,
         flexDirection:'column',
+        borderWidth : 2,
+        borderColor : '#000000',
      },
      five2:{
         width:'40%',
-        height:2.8*box_height
+        height:2.8*box_height,
+        position:'absolute',
+        right:'5%'
      },
      fivep1:{
-     flexDirection:'row',
+        flexDirection:'row',
+        width:'100%'
      },
      minusIcon:{
        color:'#ffffff',
@@ -214,8 +253,8 @@ const styles = StyleSheet.create({
      },
      sideTxt:{
         color:'#ffffff',
-        paddingTop:10,
-        paddingBottom:10,
+        paddingTop:8,
+        paddingBottom:8,
         fontSize:0.3*box_height
      },
      img:{

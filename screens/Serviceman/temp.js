@@ -1,13 +1,14 @@
 import React, { Component,useEffect } from 'react'
 
-import {StatusBar,SafeAreaView ,StyleSheet, Text, } from 'react-native'
+import {StatusBar,SafeAreaView,View ,StyleSheet, Text, } from 'react-native'
 
 export default function Default ({navigation }){
     
     return (
         <SafeAreaView >
-        <StatusBar barStyle = "dark-content" hidden = {false} backgroundColor = "#00BCD4" translucent = {true}/>
-            <Text style={{fontSize:22,fontWeight:'bold',color:'#00BCD4',}} >This is default page</Text>
+          <View style={{alignItems:'center',justifyContent:'center',marginTop:50}}>
+            <Text style={{fontSize:22,fontWeight:'bold',color:'black',}} >Page will be updated soon</Text>
+            </View>
         </SafeAreaView>
     )
 }

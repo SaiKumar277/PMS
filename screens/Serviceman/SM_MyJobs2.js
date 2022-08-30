@@ -1,39 +1,73 @@
 import React, { useState, useContext,useEffect,Component} from 'react';
-import {AppTextInput , Picker ,Dimensions, StatusBar,SafeAreaView ,StyleSheet, Text,TouchableOpacity,View ,Image,TextInput} from 'react-native';
+import {AppTextInput , Picker ,Dimensions, StatusBar,SafeAreaView ,StyleSheet, Text,TouchableOpacity,View ,Image,TextInput, ScrollView} from 'react-native';
 import Icon from 'react-native-remix-icon';
 import jobicon from '../../assets/images/jobsimg.png';
 import { Entypo,Feather,Ionicons,FontAwesome5,FontAwesome } from '@expo/vector-icons';
 import Navbar from '../../components/Navbar'
-import Button from '../../components/NrmlButton';
 import Menubar from '../../components/Menubar';
 import ModalDropdown from 'react-native-modal-dropdown';
 import AppButton from '../../components/AppButton';
 import { Auth ,API ,graphqlOperation} from 'aws-amplify';
-import {listJinfos} from '../../src/graphql/queries'
+import SM_ProfileSetup from './SM_ProfileSetup';
+import * as queries from '../../src/graphql/queries';
+import Loading from '../../components/Loading';
 import { color } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes';
+import SM_Myjobs1 from './SM_MyJobs1';
+import {getServiceman} from '../../src/graphql/queries'
+import { useIsFocused } from "@react-navigation/native";
 var { height } = Dimensions.get('window');
   var box_count = 14;
   var box_height = height / box_count;
 
 export default function SM_Myjobs2 ({navigation}){
+    const [pos, setPos] = useState(false);
     const [day, setDay] = useState('');
     const [age, setAge] = useState('');
     const [Profile, setProfile] = useState('');
+    const [DBdata,setDBdata] = useState([]);
+    const isFocused = useIsFocused();
     const [data,setData] = useState([]);
         useEffect(()=>{
-        fetchData();
-    },[]);
+            check();
+        },[pos,isFocused]);
 
+        const check =async() =>{
+            try{
+              const currentUserInfo = await Auth.currentAuthenticatedUser();
+                const Profiledata = await API.graphql(graphqlOperation(getServiceman,{ id:currentUserInfo.attributes["email"]}));
+                setDBdata(Profiledata.data.getServiceman);
+                if(Profiledata.data.getServiceman!=null)fetchData();
+                else setPos(true);
+               // console.log('DBdata',DBdata);
+            }
+            catch(err){
+                console.log('error fetching data ',err);
+            }
+        };
     const fetchData =async() =>{
       try{
-          const jobdata = await API.graphql(graphqlOperation(listJinfos));
-          setData(jobdata.data.listJinfos.items);
+        const user = await Auth.currentAuthenticatedUser();
+        //console.log('user ',user);
+        let filter = {
+            and: [{ servicemanid: {eq:user.attributes['email']} },
+                { sm_assigned: {eq:true} }]
+        };
+        const jobdata = await API.graphql({ query: queries.listServices, variables: { filter: filter}});
+          setData(jobdata.data.listServices.items);
+          console.log('jobdata ',jobdata);
+          setPos(true);
       }
       catch(err){
           console.log('error fetching data ',err);
       }
     };
   
+    if(!pos)return <Loading/>;
+    else if(DBdata==null) return <SM_ProfileSetup navigation={navigation}/>;
+    else if(data.length==0){
+           return <SM_Myjobs1 navigation={navigation}/>
+    }
+    else{
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
             <StatusBar animated = {true} backgroundColor="#000000"/>
@@ -51,31 +85,35 @@ export default function SM_Myjobs2 ({navigation}){
                 <Text style = {styles.jobTxt}>My Jobs</Text>
                 <View style={styles.lineOne}></View>
                 </View>
-                <View style={styles.f2}>
-                <Text style = {styles.newTxt}>New</Text>
+                <TouchableOpacity style={styles.f2} onPress={() => navigation.navigate('SM_NewJobs')}>
+                    <Text style = {styles.newTxt}>New</Text>
                 <View style={styles.lineTwo}></View>
-                </View>
+                </TouchableOpacity>
             </View>
            <View style = {styles.Boxes}>
                 <View style = {styles.filterB}>
                       <Text style={styles.filtxt}>Filter</Text>
                       <TouchableOpacity style = {styles.sortButton} 
-                        onPress = {() => {alert("you clicked")}}>
+                        //onPress = {() => {alert("you clicked")}}
+                        >
                         <Icon name="filter-2-line" />
                     </TouchableOpacity>
                 </View>
                 <View style = {styles.sortB}>
                     <Text style={styles.filtxt}>Sort</Text>
                     <TouchableOpacity style = {styles.sortButton} 
-                        onPress = {() => {alert("you clicked")}}>
+                        //onPress = {() => {alert("you clicked")}}
+                        >
                         <Icon name="arrow-up-down-line" />
                     </TouchableOpacity>
                 </View>
            </View>
-           <View>
+           <ScrollView>
+           {data.map((item, index) => (
+           <View key={index}>
                 <View style = {{flexDirection:'row'}}>
                     <Entypo name="dot-single" size={40} color="#FBAA30"/>
-                <Text style = {styles.txt2}>Management Company</Text>
+                <Text style = {styles.txt2}>{item.created_by}</Text>
                 </View>               
                  <TouchableOpacity style={styles.Box} onPress={() => navigation.navigate('SM_JobDetails')}>
                      <View style={{flexDirection:'row'}}>
@@ -83,8 +121,8 @@ export default function SM_Myjobs2 ({navigation}){
                          <Feather name="plus-circle" size={15} color= '#005DAF' style={styles.plus2}/>
                      </View>
                     <View>
-                    {data.map((item, index) => (
-                      <View key={index}>
+                    
+                      <View >
                         <View style={styles.Text1}>
                           <Text style={styles.t1}>Place:</Text>
                         <Text style={styles.t2}>{item.block_name}</Text>
@@ -103,10 +141,10 @@ export default function SM_Myjobs2 ({navigation}){
                       </View>
                       <View style={styles.Text1}>
                         <Text style={styles.t1}>Time:</Text>
-                        <Text style={styles.t2}>{item.time}</Text>
+                        <Text style={styles.t2}>{item.smtime}</Text>
                       </View>
                       </View>
-                      ))}
+                      
                       </View>  
                                   
                     <View style={{flexDirection:'row'}}>
@@ -115,9 +153,13 @@ export default function SM_Myjobs2 ({navigation}){
                     </View> 
                  </TouchableOpacity>
             </View>
-           <Navbar/>
+            ))}
+            <View style={{height:1.5*box_height}}/>
+            </ScrollView>
+           <Navbar navigation={navigation}/>
         </SafeAreaView>
     ); 
+    }
 }
 
 const styles = StyleSheet.create({

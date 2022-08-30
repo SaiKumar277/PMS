@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
         SignUp: async (name,email, password, Plan,{navigation}) => {
             try {
                 if(Plan!=''){
-                  await Auth.signUp({ 
+                  const response =await Auth.signUp({ 
                     username:email,
                     email, 
                     password, 
@@ -30,20 +30,23 @@ export const AuthProvider = ({ children }) => {
                       email:email,
                       'custom:Profile':Plan
                      } 
-                    }).then(navigation.navigate('ConfirmSignUp'))
+                    }).then(navigation.navigate('ConfirmSignUp',{p1:email,p2:password}))
                     
-                  console.log(' Sign-up Confirmed');
+                  console.log('sign up info ',response);
                 }
                // else alert('Select a Profile');
               } catch (error) {
                 console.log(' Error signing up...', error);
               }
           },
-        ConfirmSignUp: async(email, authCode, {updateAuthState})=>{
+        ConfirmSignUp: async(email, authCode,p1,p2, {updateAuthState})=>{
             try {
-                await Auth.confirmSignUp(email, authCode);
+              await Auth.confirmSignUp(email, authCode);
+              const response =await Auth.signIn(p1,p2);
                 updateAuthState('loggedIn');
                 console.log(' Code confirmed');
+                console.log(' signed in ',response);
+                
               } catch (error) {
                 console.log(
                   ' Verification code does not match. Please enter a valid verification code.',

@@ -10,13 +10,15 @@ const { width, height } = Dimensions.get('window');
 import illustration from '../../assets/images/Illustration.png';
 import { AuthContext } from '../../navigation/AuthProvider';
 
-export default function ConfirmSignUp({ updateAuthState }) {
+export default function ConfirmSignUp({route, updateAuthState }) {
 
   const [email, setEmail] = useState('');
 
   const [authCode, setAuthCode] = useState('');
 
   const {ConfirmSignUp } = useContext(AuthContext);
+
+  const { p1,p2 } = route.params;
 
   return (
     
@@ -31,17 +33,8 @@ export default function ConfirmSignUp({ updateAuthState }) {
           <View style={styles.box1}>
               <Text style={styles.title}>Verify</Text>
               <Text style={styles.subtitle}>Please enter the verification code we sent to your
-                email (yourmail@domain.abc)</Text>
+                email ({p1})</Text>
               <View style={styles.box2}>
-                <AppTextInput
-                  value={email}
-                  onChangeText={text => setEmail(text)}
-                  leftIcon="account"
-                  placeholder="Enter username"
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                  textContentType="emailAddress"
-                />
               <View/>
               <View style={styles.box2}>
                 <AppTextInput
@@ -58,7 +51,7 @@ export default function ConfirmSignUp({ updateAuthState }) {
                       </Text>
                   </TouchableOpacity>
               <View style={styles.box3}>
-                <AppButton title="Confirm Sign Up"  onPress={() => ConfirmSignUp (email, authCode, {updateAuthState})} />
+                <AppButton title="Confirm Sign Up"  onPress={() => ConfirmSignUp (p1, authCode, p1,p2, {updateAuthState})} />
                 </View>
               </View>
           </View>

@@ -1,36 +1,47 @@
 import React, { useState, useContext,useEffect,Component} from 'react';
-import {AppTextInput , Picker ,Dimensions, StatusBar,SafeAreaView ,StyleSheet, Text,TouchableOpacity,View ,Image,TextInput,AppButton} from 'react-native';
+import {AppTextInput , Picker ,Dimensions, StatusBar,SafeAreaView ,StyleSheet, Text,TouchableOpacity,View ,Image,TextInput,AppButton, ScrollView} from 'react-native';
 import Icon from 'react-native-remix-icon';
 import jobicon from '../../assets/images/jobsimg.png';
 import { Entypo,Feather,Ionicons,FontAwesome5,FontAwesome } from '@expo/vector-icons';
 import Navbar from '../../components/Navbar'
-import Button from '../../components/NrmlButton';
 import Menubar from '../../components/Menubar';
 import ModalDropdown from 'react-native-modal-dropdown';
 import { Auth ,API ,graphqlOperation} from 'aws-amplify';
-import {listJinfos} from '../../src/graphql/queries'
-import { color } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes';
+import * as queries from '../../src/graphql/queries';
+import Loading from '../../components/Loading';
+import { useIsFocused } from "@react-navigation/native";
 var { height } = Dimensions.get('window');
   var box_count = 14;
   var box_height = height / box_count;
 
+
 export default function SM_NewJobs ({navigation}){
     const [day, setDay] = useState('');
+    const [pos, setPos] = useState(false);
     const [age, setAge] = useState('');
     const [Profile, setProfile] = useState('');
     const [data,setData] = useState([]);
-        useEffect(()=>{
-        fetchData();
-    },[]);
+    const isFocused = useIsFocused();
 
+    useEffect(() => {  
+        fetchData();
+      }, [pos,isFocused]);
+    
     const fetchData =async() =>{
-      try{
-          const jobdata = await API.graphql(graphqlOperation(listJinfos));
-          setData(jobdata.data.listJinfos.items);
-      }
-      catch(err){
-          console.log('error fetching data ',err);
-      }
+        try{
+            const user = await Auth.currentAuthenticatedUser();
+            let filter = {
+                and: [{ servicemanid: {eq:user.attributes['email']}},
+                    { sm_assigned: {eq:false} }]
+            };
+            const oneTodo = await API.graphql({ query: queries.listServices, variables: { filter: filter}});
+            setData(oneTodo.data.listServices.items);
+            //console.log('data-->',data);
+            setPos(true);
+        }
+        catch(err){
+            console.log('error fetching data ',err);
+        }
     };
   
     return (
@@ -46,13 +57,13 @@ export default function SM_NewJobs ({navigation}){
                 </View>
             </View>
             <View style = {styles.First}>
-                <View style={styles.f1}>
-                <Text style = {styles.jobTxt}>My Jobs</Text>
-                <View style={styles.lineOne}></View>
-                </View>
-                <View style={styles.f2}>
-                <Text style = {styles.newTxt}>New</Text>
+                <TouchableOpacity style={styles.f1} onPress={() => navigation.navigate('SM_Myjobs2')}>
+                <Text style = {styles.newTxt}>My Jobs</Text>
                 <View style={styles.lineTwo}></View>
+                </TouchableOpacity>
+                <View style={styles.f2}>
+                <Text style = {styles.jobTxt}>New</Text>
+                <View style={styles.lineOne}></View>
                 </View>
             </View>
            <View style = {styles.Boxes}>
@@ -71,41 +82,49 @@ export default function SM_NewJobs ({navigation}){
                     </TouchableOpacity>
                 </View>
            </View>
-           <View>
+           {data.length==0?
+            <View style={{alignSelf:'center',justifyContent:'center',marginTop:1*box_height}}>
+                <Text style = {styles.jobTxt}>No New Jobs</Text>
+            </View>
+            :
+           <ScrollView>
+           {data.map((item, index) => (
+            <View key={index}>
                 <View style = {{flexDirection:'row'}}>
                     <Entypo name="dot-single" size={40} color="#FBAA30"/>
-                <Text style = {styles.txt2}>Management Company</Text>
+                    <Text style = {styles.txt2}>{item.created_by}</Text>
                 </View>               
-                 <TouchableOpacity style={styles.Box} onPress={() => navigation.navigate('SM_JobDetails')}>
-                     <View style={{flexDirection:'row'}}>
-                         <Feather name="plus-circle" size={15} color= '#005DAF' style={styles.plus1}/>
-                         <Feather name="plus-circle" size={15} color= '#005DAF' style={styles.plus2}/>
-                     </View>
-                    <View>
-                    {data.map((item, index) => (
-                      <View key={index}>
-                        <View style={styles.Text1}>
-                          <Text style={styles.t1}>Place:</Text>
-                        <Text style={styles.t2}>{item.block_name}</Text>
+                    <TouchableOpacity style={styles.Box} onPress={() => navigation.navigate('SM_JobDetails',{param1:item.id})}>
+                        <View style={{flexDirection:'row'}}>
+                            <Feather name="plus-circle" size={15} color= '#005DAF' style={styles.plus1}/>
+                            <Feather name="plus-circle" size={15} color= '#005DAF' style={styles.plus2}/>
                         </View>
-                      <View style={styles.Text1}>
-                        <Text style={styles.t1}>Category:</Text>
-                        <Text style={styles.t2}>{item.category}</Text>
-                      </View>
-                      <View style={styles.Text1}>
-                        <Text style={styles.t1}>Job Schedule:</Text>
-                        <Text style={styles.t2}>{item.schedule}</Text>
-                      </View>
-                      </View>
-                      ))}
-                      </View>              
+                    
+                        <View>
+                                <View style={styles.Text1}>
+                                <Text style={styles.t1}>Place:</Text>
+                                    <Text style={styles.t2}>{item.block_name}</Text>
+                                </View>
+                            <View style={styles.Text1}>
+                                <Text style={styles.t1}>Category:</Text>
+                                <Text style={styles.t2}>{item.category}</Text>
+                            </View>
+                            <View style={styles.Text1}>
+                                <Text style={styles.t1}>Job Schedule:</Text>
+                                <Text style={styles.t2}>{item.schedule}</Text>
+                            </View>
+                        </View>
+                                
                     <View style={{flexDirection:'row'}}>
                          <Feather name="plus-circle" size={15} color= '#005DAF' style={styles.plus1}/>
                          <Feather name="plus-circle" size={15} color= '#005DAF' style={styles.plus2}/>
                     </View> 
                  </TouchableOpacity>
-            </View>
-           <Navbar/>
+                 </View>
+                 ))}
+                 <View style={{height:1.5*box_height}}/>
+                 </ScrollView>}
+           <Navbar navigation={navigation}/>
         </SafeAreaView>
     ); 
 }
@@ -213,7 +232,7 @@ const styles = StyleSheet.create({
     lineOne:{      
         height : '6%',
         width:'100%',
-        marginLeft:5,
+        //marginLeft:5,
         backgroundColor:"#00286B"
     },
     lineTwo:{       
@@ -229,7 +248,7 @@ const styles = StyleSheet.create({
         color:'#005DAF',
         marginLeft:20,
         fontWeight:'bold',
-        alignSelf:'flex-start'
+        alignSelf:'center'
     },
     newTxt:{
         fontSize:23,

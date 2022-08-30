@@ -10,15 +10,20 @@ import ImageUploader from '../../components/ImageUploader'
 import { MultiselectDropdown } from 'sharingan-rn-modal-dropdown';
 import { Auth ,API ,graphqlOperation} from 'aws-amplify';
 import PhoneInput from 'react-native-phone-number-input';
-import {listServicemen} from '../../src/graphql/queries'
+import {getServiceman} from '../../src/graphql/queries'
+import {updateServiceman} from '../../src/graphql/mutations'
 import * as ImagePicker from 'expo-image-picker';
 import {Storage} from 'aws-amplify';
+import Loading from '../../components/Loading';
 import mime from "mime";
 
 var { height } = Dimensions.get('window');
 export default function App ({navigation, updateAuthState }){
     const [DBdata,setDBdata] = useState([]);
+    const [pos, setPos] = useState(false);
+    const [imageSource, setImageSource] = useState(null);
     const [img, setImg] = useState('');
+    const [id, setId] = useState('');
     const [photo, setPhoto] = useState(null);
     const [name, setName] = useState('');
     const [age, setAge] = useState(0);
@@ -68,21 +73,24 @@ export default function App ({navigation, updateAuthState }){
   
       const fetchData =async() =>{
           try{
-              const Profiledata = await API.graphql(graphqlOperation(listServicemen));
-              setDBdata(Profiledata.data.listServicemen.items);
+            const currentUserInfo = await Auth.currentAuthenticatedUser();
+              const Profiledata = await API.graphql(graphqlOperation(getServiceman,{ id:currentUserInfo.attributes["email"]}));
+              setDBdata(Profiledata.data.getServiceman);
+              await getImage(Profiledata.data.getServiceman.image);
+              setPos(true);
              // console.log('Profiledata',DBdata['id']);
           }
           catch(err){
               console.log('error fetching data ',err);
           }
       };
+      
+      
 
       useEffect(() => {
-        
         fetchData(); 
         (async () => {
-            const user = await Auth.currentAuthenticatedUser();
-        //console.log('user',user);
+            
             
           if (Platform.OS !== 'web') {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -91,7 +99,7 @@ export default function App ({navigation, updateAuthState }){
             }
           }
         })();
-      }, []);
+      }, [pos]);
     
       const pickImage = async () => {
         const user = await Auth.currentAuthenticatedUser();
@@ -103,29 +111,41 @@ export default function App ({navigation, updateAuthState }){
         });
     
         console.log(result);
-    
         if (!result.cancelled) {
             setImg(user.attributes['email']);
           setPhoto(result);
         }
       };
+
+      const getImage = async (img) => {
+        try {
+          const imageURL = await Storage.get(img);
+          setImageSource({
+            uri: imageURL,
+          });
+          console.log(imageURL,'imageURL');
+        } catch (e) {
+          console.log(e);
+        }
+      };
      
       const handleSubmit = async () => {
         try {
+           if(photo){
             const newImageUri =  "file:///" + photo.uri.split("file:/").join("");
-            const user = await Auth.currentAuthenticatedUser();
-            console.log('user',user);
-          if (photo) {
-            const photoResponse = await fetch(newImageUri);
-            const blob = await photoResponse.blob();
-            await Storage.put(newImageUri.split("/").pop(), blob, {
-                contentType: mime.getType(newImageUri),
-              });
-          }
-          console.log(newImageUri.split("/").pop());
-          const response=await API.graphql(graphqlOperation(createServiceman, {
+            if (photo) {
+              const photoResponse = await fetch(newImageUri);
+              const blob = await photoResponse.blob();
+              await Storage.put(newImageUri.split("/").pop(), blob, {
+                  contentType: mime.getType(newImageUri),
+                });
+            }
+            console.log(newImageUri.split("/").pop());
+           }
+           console.log('phone::',phoneNumber);
+          const response=await API.graphql(graphqlOperation(updateServiceman, {
             input: {
-              id : user.attributes['email'] ,
+              id : id ,
               name : name,
               age : age,
               sex :sex,
@@ -133,8 +153,8 @@ export default function App ({navigation, updateAuthState }){
               address: address,
               postcode:postcode,
               county:county,
-              phonenumber : phoneNumber,
-              image: photo ? newImageUri.split("/").pop() : 'none',
+              phonenumber : phoneNumber?phoneNumber:DBdata.phoneNumber,
+              image: photo ? newImageUri.split("/").pop() : data.image,
             }
           }));
           console.log('response: ',response);
@@ -143,25 +163,31 @@ export default function App ({navigation, updateAuthState }){
             console.log(e);
           }
       };
-
+    if(!pos)return <Loading/>;
+    else{
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
              <StatusBar animated = {true} backgroundColor="#000000"/>      
             <Menubar navigation={navigation} />
             <ScrollView >
-            {DBdata.map((DBdata, index) => (
   
-                <View key={index}>
+                <View >
                     <Text style = {styles.txt}>Profile</Text>
                 <TouchableOpacity style = {styles.proImage} 
                     onPress={pickImage} > 
-                    {photo ? <Image style={{width: '100%', height: '100%',}} source={{uri: photo.uri}} />:<Image  source = {proImg}/>}
+                    {imageSource && (
+                        <Image source={imageSource} style={{width: '100%', height: '100%',resizeMode:'center'}} />
+                    )}
+                    {!imageSource && (
+                        <Image  source = {proImg}/>
+                    )}
                 </TouchableOpacity>  
-                <Text style = {styles.txt1}>Upload a profile picture</Text>
+                {/* <Text style = {styles.txt1}>Upload a profile picture</Text> */}
                 <Text style = {styles.nametxt}>Name</Text>
                 <View style = {styles.nameInput}>
                     <TextInput
-                        placeholder={DBdata.name}
+                        defaultValue={DBdata.name}
+                       
                         autoCapitalize="none"
                         autoCorrect={false}  
                         keyboardType="email-address"
@@ -175,7 +201,7 @@ export default function App ({navigation, updateAuthState }){
                 </View >
                 <View style = {styles.firstRow1}>
                     <TextInput
-                        placeholder={DBdata.age.toString()}
+                        defaultValue={DBdata.age.toString()}
                         style = {styles.ageInput}
                         keyboardType = "numeric"
                         maxLength = {3}
@@ -198,9 +224,8 @@ export default function App ({navigation, updateAuthState }){
             </View>
             <View style={styles.box1}>
                 <PhoneInput
-                placeholder={DBdata.phonenumber.toString()}
+               defaultValue={DBdata.phonenumber}
                     ref={phoneInput}
-                    
                     defaultCode="GB"
                     layout="first"
                     withShadow
@@ -214,7 +239,7 @@ export default function App ({navigation, updateAuthState }){
             <Text style = {styles. adrstxt}>Address</Text>
             <View style = {styles.nameInput}>
                 <TextInput
-                    placeholder={DBdata.address}
+                    defaultValue={DBdata.address}
                     autoCapitalize="none"
                     autoCorrect={false}  
                     keyboardType="email-address"
@@ -225,7 +250,7 @@ export default function App ({navigation, updateAuthState }){
             <Text style = {styles.adrstxt}>Post code</Text>
             <View style = {styles.nameInput}>
                 <TextInput
-                    placeholder={DBdata.postcode.toString()}
+                    defaultValue={DBdata.postcode}
                     autoCapitalize="none"
                     autoCorrect={false}  
                     keyboardType = "numeric"
@@ -236,7 +261,7 @@ export default function App ({navigation, updateAuthState }){
             <Text style = {styles.adrstxt}>County</Text>
             <View style = {styles.nameInput}>
                 <TextInput
-                    placeholder={DBdata.county}
+                    defaultValue={DBdata.county}
                     autoCapitalize="none"
                     autoCorrect={false}  
                     keyboardType="email-address"
@@ -248,16 +273,16 @@ export default function App ({navigation, updateAuthState }){
                 <AppButton title="Update" onPress={handleSubmit}
                 />
             </View>
-            <View style = {styles.loginButton}>
+            {/* <View style = {styles.loginButton2}>
                 <AppButton title="Log Out" onPress={signOut}
                 />
-            </View>
+            </View> */}
                 </View>
-                ))}
                 
             </ScrollView>
         </SafeAreaView>
     );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -418,9 +443,15 @@ ddtxtsty:{
 },
 loginButton : {
     alignSelf:'center',
-    paddingBottom:height*0.15,
+    paddingBottom:height*0.05,
     width:'40%',
     height : height*0.10,
+},
+loginButton2 : {
+  alignSelf:'center',
+  paddingBottom:height*0.15,
+  width:'40%',
+  height : height*0.10,
 }
  
 });

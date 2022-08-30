@@ -15,8 +15,10 @@ export const createServiceman = /* GraphQL */ `
       address
       postcode
       county
+      calloutcharge
       phonenumber
       image
+      rating
       createdAt
       updatedAt
     }
@@ -36,8 +38,10 @@ export const updateServiceman = /* GraphQL */ `
       address
       postcode
       county
+      calloutcharge
       phonenumber
       image
+      rating
       createdAt
       updatedAt
     }
@@ -57,62 +61,253 @@ export const deleteServiceman = /* GraphQL */ `
       address
       postcode
       county
+      calloutcharge
       phonenumber
       image
+      rating
       createdAt
       updatedAt
     }
   }
 `;
-export const createJinfo = /* GraphQL */ `
-  mutation CreateJinfo(
-    $input: CreateJinfoInput!
-    $condition: ModelJinfoConditionInput
+export const createMCSignupinfo = /* GraphQL */ `
+  mutation CreateMCSignupinfo(
+    $input: CreateMCSignupinfoInput!
+    $condition: ModelMCSignupinfoConditionInput
   ) {
-    createJinfo(input: $input, condition: $condition) {
+    createMCSignupinfo(input: $input, condition: $condition) {
       id
-      created_by
-      block_name
-      category
-      schedule
-      day
-      time
+      contract_type
+      notes
       createdAt
       updatedAt
     }
   }
 `;
-export const updateJinfo = /* GraphQL */ `
-  mutation UpdateJinfo(
-    $input: UpdateJinfoInput!
-    $condition: ModelJinfoConditionInput
+export const updateMCSignupinfo = /* GraphQL */ `
+  mutation UpdateMCSignupinfo(
+    $input: UpdateMCSignupinfoInput!
+    $condition: ModelMCSignupinfoConditionInput
   ) {
-    updateJinfo(input: $input, condition: $condition) {
+    updateMCSignupinfo(input: $input, condition: $condition) {
       id
-      created_by
-      block_name
-      category
-      schedule
-      day
-      time
+      contract_type
+      notes
       createdAt
       updatedAt
     }
   }
 `;
-export const deleteJinfo = /* GraphQL */ `
-  mutation DeleteJinfo(
-    $input: DeleteJinfoInput!
-    $condition: ModelJinfoConditionInput
+export const deleteMCSignupinfo = /* GraphQL */ `
+  mutation DeleteMCSignupinfo(
+    $input: DeleteMCSignupinfoInput!
+    $condition: ModelMCSignupinfoConditionInput
   ) {
-    deleteJinfo(input: $input, condition: $condition) {
+    deleteMCSignupinfo(input: $input, condition: $condition) {
       id
+      contract_type
+      notes
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createMCPropertyinfo = /* GraphQL */ `
+  mutation CreateMCPropertyinfo(
+    $input: CreateMCPropertyinfoInput!
+    $condition: ModelMCPropertyinfoConditionInput
+  ) {
+    createMCPropertyinfo(input: $input, condition: $condition) {
+      id
+      name
+      city
+      region
+      postcode
+      county
+      country
       created_by
-      block_name
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateMCPropertyinfo = /* GraphQL */ `
+  mutation UpdateMCPropertyinfo(
+    $input: UpdateMCPropertyinfoInput!
+    $condition: ModelMCPropertyinfoConditionInput
+  ) {
+    updateMCPropertyinfo(input: $input, condition: $condition) {
+      id
+      name
+      city
+      region
+      postcode
+      county
+      country
+      created_by
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteMCPropertyinfo = /* GraphQL */ `
+  mutation DeleteMCPropertyinfo(
+    $input: DeleteMCPropertyinfoInput!
+    $condition: ModelMCPropertyinfoConditionInput
+  ) {
+    deleteMCPropertyinfo(input: $input, condition: $condition) {
+      id
+      name
+      city
+      region
+      postcode
+      county
+      country
+      created_by
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createServices = /* GraphQL */ `
+  mutation CreateServices(
+    $input: CreateServicesInput!
+    $condition: ModelServicesConditionInput
+  ) {
+    createServices(input: $input, condition: $condition) {
+      id
       category
       schedule
       day
-      time
+      blockid
+      istarttime
+      iendtime
+      startdate
+      serviceman
+      servicemanid
+      sm_assigned
+      block_name
+      created_by
+      notes
+      smtime
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateServices = /* GraphQL */ `
+  mutation UpdateServices(
+    $input: UpdateServicesInput!
+    $condition: ModelServicesConditionInput
+  ) {
+    updateServices(input: $input, condition: $condition) {
+      id
+      category
+      schedule
+      day
+      blockid
+      istarttime
+      iendtime
+      startdate
+      serviceman
+      servicemanid
+      sm_assigned
+      block_name
+      created_by
+      notes
+      smtime
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteServices = /* GraphQL */ `
+  mutation DeleteServices(
+    $input: DeleteServicesInput!
+    $condition: ModelServicesConditionInput
+  ) {
+    deleteServices(input: $input, condition: $condition) {
+      id
+      category
+      schedule
+      day
+      blockid
+      istarttime
+      iendtime
+      startdate
+      serviceman
+      servicemanid
+      sm_assigned
+      block_name
+      created_by
+      notes
+      smtime
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createServiceDetails = /* GraphQL */ `
+  mutation CreateServiceDetails(
+    $input: CreateServiceDetailsInput!
+    $condition: ModelServiceDetailsConditionInput
+  ) {
+    createServiceDetails(input: $input, condition: $condition) {
+      id
+      startimgs
+      starttime
+      endimgs
+      endtime
+      servicesid
+      blockid
+      serviceman
+      category
+      servicemanid
+      block
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateServiceDetails = /* GraphQL */ `
+  mutation UpdateServiceDetails(
+    $input: UpdateServiceDetailsInput!
+    $condition: ModelServiceDetailsConditionInput
+  ) {
+    updateServiceDetails(input: $input, condition: $condition) {
+      id
+      startimgs
+      starttime
+      endimgs
+      endtime
+      servicesid
+      blockid
+      serviceman
+      category
+      servicemanid
+      block
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteServiceDetails = /* GraphQL */ `
+  mutation DeleteServiceDetails(
+    $input: DeleteServiceDetailsInput!
+    $condition: ModelServiceDetailsConditionInput
+  ) {
+    deleteServiceDetails(input: $input, condition: $condition) {
+      id
+      startimgs
+      starttime
+      endimgs
+      endtime
+      servicesid
+      blockid
+      serviceman
+      category
+      servicemanid
+      block
       createdAt
       updatedAt
     }

@@ -6,7 +6,7 @@ var { height } = Dimensions.get('window');
   var box_count = 9.5;
   var box_height = height / box_count;
 //style={{direction:'ltr',paddingLeft:6}}
-export default function Navbar() {
+export default function Navbar({navigation}) {
     
   return (
     <View style = {styles.botmBox}>
@@ -19,14 +19,14 @@ export default function Navbar() {
             
             <View style={styles.inrbox}>
                 <View style = {styles.cir}>
-                    <MaterialCommunityIcons name="calendar-clock" size={27} style = {styles.b1} color="#00286B" />
+                    <MaterialCommunityIcons name="calendar-clock" size={27} style = {styles.b1} color="#00286B" onPress={() => navigation.navigate('SM_Schedule')}/>
                 </View>
                 <Text >schedule</Text>
             </View>
             
             <View style={styles.inrbox}>
                 <View style = {styles.cir}>
-                    <Ionicons name="document" size={25} style = {styles.b1} color="#00286B"/>
+                    <Ionicons name="document" size={25} style = {styles.b1} color="#00286B" onPress={() => navigation.navigate('temp')}/>
                 </View>
                 <Text >Docs</Text>
             </View>
@@ -50,13 +50,14 @@ const styles = StyleSheet.create({
         borderTopLeftRadius:40,
         borderWidth:5,
         borderColor:"#00286B",
-        marginBottom:2,
+        //marginBottom:2,
         position: 'absolute', 
         bottom: 0,
         flex : 1,
         flexDirection:'row',
         justifyContent:'space-evenly',
        // alignItems:'center'
+       backgroundColor:'white'
     },
     inrbox:{
         marginTop:4,

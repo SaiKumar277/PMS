@@ -12,8 +12,10 @@ export const getServiceman = /* GraphQL */ `
       address
       postcode
       county
+      calloutcharge
       phonenumber
       image
+      rating
       createdAt
       updatedAt
     }
@@ -35,8 +37,10 @@ export const listServicemen = /* GraphQL */ `
         address
         postcode
         county
+        calloutcharge
         phonenumber
         image
+        rating
         createdAt
         updatedAt
       }
@@ -44,36 +48,165 @@ export const listServicemen = /* GraphQL */ `
     }
   }
 `;
-export const getJinfo = /* GraphQL */ `
-  query GetJinfo($id: ID!) {
-    getJinfo(id: $id) {
+export const getMCSignupinfo = /* GraphQL */ `
+  query GetMCSignupinfo($id: ID!) {
+    getMCSignupinfo(id: $id) {
       id
-      created_by
-      block_name
-      category
-      schedule
-      day
-      time
+      contract_type
+      notes
       createdAt
       updatedAt
     }
   }
 `;
-export const listJinfos = /* GraphQL */ `
-  query ListJinfos(
-    $filter: ModelJinfoFilterInput
+export const listMCSignupinfos = /* GraphQL */ `
+  query ListMCSignupinfos(
+    $filter: ModelMCSignupinfoFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    listJinfos(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    listMCSignupinfos(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        contract_type
+        notes
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getMCPropertyinfo = /* GraphQL */ `
+  query GetMCPropertyinfo($id: ID!) {
+    getMCPropertyinfo(id: $id) {
+      id
+      name
+      city
+      region
+      postcode
+      county
+      country
+      created_by
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listMCPropertyinfos = /* GraphQL */ `
+  query ListMCPropertyinfos(
+    $filter: ModelMCPropertyinfoFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listMCPropertyinfos(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        city
+        region
+        postcode
+        county
+        country
         created_by
-        block_name
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getServices = /* GraphQL */ `
+  query GetServices($id: ID!) {
+    getServices(id: $id) {
+      id
+      category
+      schedule
+      day
+      blockid
+      istarttime
+      iendtime
+      startdate
+      serviceman
+      servicemanid
+      sm_assigned
+      block_name
+      created_by
+      notes
+      smtime
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listServices = /* GraphQL */ `
+  query ListServices(
+    $filter: ModelServicesFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listServices(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
         category
         schedule
         day
-        time
+        blockid
+        istarttime
+        iendtime
+        startdate
+        serviceman
+        servicemanid
+        sm_assigned
+        block_name
+        created_by
+        notes
+        smtime
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getServiceDetails = /* GraphQL */ `
+  query GetServiceDetails($id: ID!) {
+    getServiceDetails(id: $id) {
+      id
+      startimgs
+      starttime
+      endimgs
+      endtime
+      servicesid
+      blockid
+      serviceman
+      category
+      servicemanid
+      block
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const listServiceDetails = /* GraphQL */ `
+  query ListServiceDetails(
+    $filter: ModelServiceDetailsFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listServiceDetails(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        startimgs
+        starttime
+        endimgs
+        endtime
+        servicesid
+        blockid
+        serviceman
+        category
+        servicemanid
+        block
         createdAt
         updatedAt
       }

@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity,View, Text, StyleSheet, Button } from 'react-native';
 import { Auth } from 'aws-amplify';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-export default function MC_Home({ updateAuthState }) {
+export default function LogOutcomp({ updateAuthState }) {
   async function signOut() {
     try {
       await Auth.signOut();
@@ -11,30 +11,31 @@ export default function MC_Home({ updateAuthState }) {
       console.log('Error signing out: ', error);
     }
   }
-//<Button title="Plan" color="tomato" onPress={trail} />
-  return (
-    <View style={styles.container}>
-      <Button title="Sign Out" color="#00286B" onPress={signOut} />
 
-      <MaterialCommunityIcons
-          name="plus"
-          size={45}
-          color="#788190"
-          style={styles.icon}
-        />
-      <Text style={{fontSize:20}}>MC</Text>
-      
+  return (
+    <View style={styles.container} >
+        <View style={{justifyContent:'center',marginVertical:50}}>
+            <Text style = {styles.jobTxt}>
+                All your data is saved!
+            </Text>
+        </View>
+      <Button title="Sign Out" color="#00286B" onPress={signOut} />
     </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent:'center',
-    marginTop: 20
+    //width:'30%',
+    marginVertical:20,
+    alignSelf:'center',
+    alignItems:'center'
   },
-  icon:{
-    paddingVertical:25
-  }
+  jobTxt :{
+    padding:2,
+    fontSize:23,
+    color:'#005DAF',
+    marginLeft:20,
+    fontWeight:'bold',
+    alignSelf:'center'
+},
 });

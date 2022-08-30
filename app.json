@@ -6,6 +6,9 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "android":{"softwareKeyboardLayoutMode": "pan"}
+    "android": {
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.sai11815107.PMS"
+    }
   }
 }

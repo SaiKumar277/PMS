@@ -21,6 +21,25 @@ export default function SignIn({ navigation ,updateAuthState}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { SignIn } = useContext(AuthContext);
+  const handleSubmit = async () => {
+    try {
+      if(email.trim() == "select" || password.trim() == "select")
+              {
+                  console.log("AlertBox: ");
+                  Alert.alert(
+                      "Enter all fields",
+                      "You left some required fields",
+                    );
+              }
+      else{
+        SignIn(email, password ,{updateAuthState});
+        } 
+      }
+      catch(e){
+        console.log(e);
+      }
+
+};
   return (
       <SafeAreaView style={styles.safeAreaContainer}>
       <View style={styles.container}>
@@ -66,7 +85,7 @@ export default function SignIn({ navigation ,updateAuthState}) {
                     I don't have account
                     </Text>
                 </TouchableOpacity>
-                <AppButton title="Login" onPress={() => SignIn(email, password ,{updateAuthState})} />
+                <AppButton title="Login" onPress={handleSubmit} />
                 <View style={styles.footerButtonContainer}>
                
                 </View>

@@ -25,6 +25,7 @@ export default function App ({navigation}){
     const [address, setAddress] = useState('');
     const [postcode, setPostcode] = useState('');
     const [county, setCounty] = useState('');
+    const [callout, setCallout] = useState(0);
     const [phoneNumber, setPhoneNumber] = useState('');
     const phoneInput = useRef(null);
     const [valueMS, setValueMS] = useState([]);
@@ -84,6 +85,16 @@ export default function App ({navigation}){
      
       const handleSubmit = async () => {
         try {
+          
+          if(name.trim() == "" || age.trim() == ""|| sex.trim() == ""|| postcode.trim() == ""|| county.trim() == ""|| valueMS.length ==0)
+            {
+                console.log("AlertBox: ");
+                Alert.alert(
+                    "Enter all fields",
+                    "You left some required fields",
+                    );
+            }
+        else{
            
           const newImageUri =  "file:///" + photo.uri.split("file:/").join("");
             const user = await Auth.currentAuthenticatedUser();
@@ -95,6 +106,7 @@ export default function App ({navigation}){
               });
           }
           console.log(newImageUri.split("/").pop());
+          console.log(user.attributes['email']);
           const response=await API.graphql(graphqlOperation(createServiceman, {
             input: {
               id : user.attributes['email'] ,
@@ -106,17 +118,22 @@ export default function App ({navigation}){
               postcode:postcode,
               county:county,
               phonenumber : phoneNumber,
+              rating:0,
+              calloutcharge:callout,
               image: photo ? newImageUri.split("/").pop() : 'none',
             }
+          })).then(navigation.navigate('Rough',
+          {   
+              msg:'Details submitted',
           }));
-          navigation.navigate('SM_Myjobs1');
           console.log('response: ',response);
 
         } 
+      }
         catch(e){
             console.log(e);
           }
-      };
+        };
 
     return (
         <SafeAreaView style={styles.safeAreaContainer}>
@@ -146,17 +163,20 @@ export default function App ({navigation}){
                 </View >
                 <View style = {styles.firstRow1}>
                     <TextInput
+                        placeholder='Enter Age'
                         style = {styles.ageInput}
                         keyboardType = "numeric"
                         maxLength = {3}
                         onChangeText = {(text) => setAge(text)}
                         numberOfLines = {1}
+                        fontSize={18}
                         textAlign="left"
                     /> 
 
                     <View style= {styles.sexInput}>
                     <ModalDropdown   
-                        
+                       // headerContainerStyle={{backgroundColor:'#F1F6FF'}}
+                        color='#F1F6FF'
                         onSelect = {(index, value) => { setSex(value)} } 
                         dropdownTextStyle={styles.ddtxtsty} 
                         dropdownStyle={styles.ddsty} 
@@ -175,7 +195,7 @@ export default function App ({navigation}){
                     layout="first"
                     withShadow
                     containerStyle={styles.phoneNumberView}
-                    textContainerStyle={{ borderBottomRightRadius:10,borderTopRightRadius:10,   paddingVertical: 0 ,backgroundColor:'#E3EDFF'}}
+                    textContainerStyle={{ borderBottomRightRadius:10,borderTopRightRadius:10,   paddingVertical: 0 ,backgroundColor:'#F1F6FF'}}
                     onChangeFormattedText={text => {
                     setPhoneNumber(text);
                     }}
@@ -192,17 +212,7 @@ export default function App ({navigation}){
                     fontSize={18}
                 />
             </View>
-            <Text style = {styles.adrstxt}>Post code</Text>
-            <View style = {styles.nameInput}>
-                <TextInput
-                    placeholder="Enter Postal code"
-                    autoCapitalize="none"
-                    autoCorrect={false}  
-                    keyboardType="email-address"
-                    onChangeText={(text) => setPostcode(text)}
-                    fontSize={18}
-                />
-            </View>
+            
             <Text style = {styles.adrstxt}>County</Text>
             <View style = {styles.nameInput}>
                 <TextInput
@@ -213,6 +223,35 @@ export default function App ({navigation}){
                     onChangeText={(text) => setCounty(text)}
                     fontSize={18}
                 />
+            </View>
+            <View style = {styles.secondRow0}>
+                    <Text style = {styles.nametxt3}>Post Code</Text>
+                    <Text style = {styles.nametxt4}>Callout charge</Text>
+                </View >
+            <View style = {styles.secondRow1}>
+            
+                <View style = {styles.pcInput}>
+                    <TextInput
+                        placeholder="Postal code"
+                        autoCapitalize="none"
+                        autoCorrect={false}  
+                        keyboardType="email-address"
+                        onChangeText={(text) => setPostcode(text)}
+                        fontSize={18}
+                    />
+                </View>
+                <View style = {styles.pcInput1}>
+                    <TextInput
+                       // style={{width:'50%',borderColor:'#b3b3b3',borderWidth:1}}
+                        defaultValue='0'
+                        autoCapitalize="none"
+                        autoCorrect={false}  
+                        keyboardType="numeric"
+                        onChangeText={(text) => setCallout(text)}
+                        fontSize={18}
+                    />
+                    <Text style={{fontSize:18,color:'#595959'}}>GBP</Text>
+                </View>
             </View>
             
             <View style={styles.multdd}>
@@ -229,7 +268,7 @@ export default function App ({navigation}){
                 />
             </View>
             <View style = {styles.loginButton}>
-                <AppButton title="Done" onPress={handleSubmit}
+                <AppButton title="Submit" onPress={handleSubmit}
                 />
             </View>
     </ScrollView>
@@ -271,7 +310,7 @@ const styles = StyleSheet.create({
         alignSelf:'center',
        // justifyContent : 'center',
         height:height*0.15,
-        width:'30%'
+        width:'30%',
     },
     txt1:{       
         fontSize:18,
@@ -288,16 +327,60 @@ const styles = StyleSheet.create({
         alignSelf:'center',
         paddingLeft:height*0.02,
         justifyContent:'center',
-        backgroundColor:'#E3EDFF',
+        backgroundColor:'#F1F6FF',
         width:'88%',
         height:height*0.06,
-        borderRadius:10
+        borderRadius:8,
+        borderColor:'#E3EDFF',
+        shadowColor: '#000000',
+        shadowOffset: {width: 0, height: 1},
+        shadowOpacity: 0.2,
+        elevation: 3,
+    },
+    pcInput:{
+      alignSelf:'center',
+      paddingLeft:height*0.02,
+      justifyContent:'center',
+      backgroundColor:'#F1F6FF',
+      width:'47%',
+      height:height*0.06,
+      borderRadius:8,
+      borderColor:'#E3EDFF',
+      shadowColor: '#000000',
+      shadowOffset: {width: 0, height: 1},
+      shadowOpacity: 0.2,
+      elevation: 3,
+    },
+    pcInput1:{
+      flexDirection:'row',
+      alignSelf:'center',
+      alignItems:'center',
+      paddingLeft:height*0.02,
+      alignItems:'center',
+      justifyContent:'space-between',
+      paddingRight:0.03*height,
+      backgroundColor:'#F1F6FF',
+      width:'47%',
+      height:height*0.06,
+      borderRadius:8,
+      borderColor:'#E3EDFF',
+      shadowColor: '#000000',
+      shadowOffset: {width: 0, height: 1},
+      shadowOpacity: 0.2,
+      elevation: 3,
     },
 firstRow:{
     flexDirection : 'row',
     width:'88%',
     height:height*0.05,
     marginTop:'3%'
+   },
+   secondRow0:{
+    flexDirection : 'row',
+   // width:'88%',
+    height:height*0.05,
+    marginTop:'3%',
+    justifyContent:'space-between'
    },
    firstRow1:{
       // marginVertical:10,
@@ -306,6 +389,13 @@ firstRow:{
         flexDirection : 'row',
         width:'90%',
         height:height*0.06
+   },
+   secondRow1:{
+    marginLeft : '6%',
+    flexDirection : 'row',
+    width:'90%',
+    height:height*0.06,
+    justifyContent:'space-between'
    },
 nametxt1:{
     fontSize:20,
@@ -321,15 +411,34 @@ nametxt2:{
     marginLeft:height*0.05,
     width:'40%'
 },
+nametxt3:{
+  fontSize:20,
+  alignSelf:'flex-start',
+  padding:5,
+  marginLeft:height*0.035,
+  width:'35%'
+},
+nametxt4:{
+  fontSize:19,
+  alignSelf:'flex-start',
+  padding:5,
+  //marginLeft:height*0.05,
+  width:'45%'
+},
 ageInput:{
     flex : 1,
     textAlign:'left',
     paddingLeft:15,
-    backgroundColor:'#E3EDFF',
-    fontSize:15,
+    backgroundColor:'#F1F6FF',
+    fontSize:18,
    // marginLeft:'5%',
     marginRight:10,
-    borderRadius:10,
+    borderRadius:8,
+    borderColor:'#E3EDFF',
+    shadowColor: '#000000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.2,
+    elevation: 3,
     width:'3%',
     height : '100%',
     alignSelf:'flex-start'
@@ -338,11 +447,16 @@ sexInput:{
     flex : 1,
     paddingLeft:15,
     paddingTop:'3%',
-    backgroundColor:'#E3EDFF',
+    backgroundColor:'#F1F6FF',
     fontSize:15,
     marginLeft:10,
     marginRight:10,
-    borderRadius:10,
+    borderRadius:8,
+    borderColor:'#E3EDFF',
+    shadowColor: '#000000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.2,
+    elevation: 3,
     width:'3%',
     height : '100%',
     //alignSelf:'flex-start',
@@ -353,7 +467,12 @@ phoneNumberView: {
     backgroundColor:'#ccdeff',
    // borderWidth:1,
     marginLeft:'7%',
-    borderRadius:10,
+    borderRadius:8,
+    borderColor:'#E3EDFF',
+    shadowColor: '#000000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.2,
+    elevation: 3,
     alignSelf:'flex-start',
     marginTop:'9%',
    
@@ -381,7 +500,7 @@ ddsty:{
     height:height*0.11,
     color: '#101010',
     fontSize: 30,
-    width: '70%',
+    width: '40%',
     justifyContent:'center'
   
 },
